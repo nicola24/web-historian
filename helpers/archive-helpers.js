@@ -59,35 +59,31 @@ exports.addUrlToList = function(url, callback) {
 };
 
 exports.isUrlArchived = function(url, callback) {
+  return fs.access(exports.paths.archivedSites + '/' + url, (err) => {
+    if (!err) {
+      callback(null, true);
+    } else if (err.code === 'ENOENT') {
+      callback(null, false);
+    } else {
+      callback(err, null);
+    }
+  });
+
 };
 
 exports.downloadUrls = function(urls) {
+  urls.forEach(url => {
+    exports.isUrlArchived(url, (err, data) => {
+      if (!data) {
+        fs.writeFile(exports.paths.archivedSites + '/' + url, (err) => {
+          if (err) {
+            throw err;
+          }
+        });
+      }
+    });
+  });
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// true, example.com
+// false, google.com
