@@ -11,6 +11,7 @@ const { URL } = require('url');
 
 exports.paths = {
   siteAssets: path.join(__dirname, '../web/public'),
+  htmlPage: path.join(__dirname, '../web/public/index.html'),
   archivedSites: path.join(__dirname, '../archives/sites'),
   list: path.join(__dirname, '../archives/sites.txt'),
 };
