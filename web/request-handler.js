@@ -10,55 +10,52 @@ var defaultCorsHeaders = {
   'access-control-allow-headers': 'content-type, accept',
   'access-control-max-age': 10 // Seconds.
 };
-exports.handleRequest = function (req, res) {
-  let {method, url, headers} = req;
-   
-  headers = defaultCorsHeaders;
-  
-  
-  //   if (method === 'GET') {
-  //     fs.readFile(archive.paths.htmlPage, (err, data) => {
-  //       // if nothing then return html page
-  //       if (url === '/') {
-  //         res.writeHead(200, {'Content-type': 'text/html'});
-  //         res.end(data.toString());
-  //       }
-    
-    
 
-  // };
-  if (method === 'GET' && url === 'google') {
-    archive.isUrlArchived(url, (err, data) => {
-      if (err) {
-        throw err;
-      }
-      if (!data) {
-        res.writeHead(404);
-        isUrlInList(url, (err, data) => {
-          if (!data) {
-            addUrlToList(url);
-          } 
-        });
-      } else {
+exports.handleRequest = function (req, res) {
+   
+  req.headers = defaultCorsHeaders;
+  
+  if (req.method === 'GET') {
+    
+    // should return the content of index.html, 
+    // if no url then return html page
+    if (req.url === '/') {
+      
+      fs.readFile(archive.paths.htmlPage, (err, data) => {
         res.writeHead(200, {'Content-type': 'text/html'});
         res.end(data.toString());
-      } 
-    }); 
+      });
+    
+    // else check for url
+    } else { 
+      
+      // helper function to check if url is archived
+      archive.isUrlArchived(req.url, function(err, test) {
+          
+        console.log('url: ', req.url, 'test true: ', test); // /www.google.com & /arglebargle, true & false
+
+        // if true it should return the content of a website from the archive 
+        if (test === true) {
+          
+          console.log(archive.paths.archivedSites + req.url); // /www.google.com, truefalse
+          
+          fs.readFile(archive.paths.siteAssets + req.url, function(err, data) {
+            res.writeHead(200);
+            res.end(archive.paths.archivedSites + req.url); 
+          }); 
+        
+        // if false it should 404 when asked for a nonexistent file
+        } else {
+          
+          console.log('url: ', req.url, 'test false: ', test); // /arglebargle, false
+          
+          res.writeHead(404);
+          res.end();
+        }
+      });
+
+    }
   }
-
-  if (method === 'GET') {
-    console.log(url);
-    fs.readFile(archive.paths.htmlPage, (err, data) => {
-      if (err) {
-        res.writeHead(404);
-      } else {
-        res.writeHead(200, {'Content-type': 'text/html'});
-      }
-      res.end(data.toString());
-    });
-  }
-
-
 };
 
 
