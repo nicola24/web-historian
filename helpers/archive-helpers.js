@@ -85,6 +85,3 @@ exports.downloadUrls = function(urls) {
     });
   });
 };
-
-// true, example.com
-// false, google.com
